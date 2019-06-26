@@ -1,9 +1,11 @@
-package com.codepath;
+package com.codepath.simpletodo;
 
+import android.app.Activity;
 import android.content.Intent;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
+import android.view.inputmethod.InputMethodManager;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.EditText;
@@ -12,7 +14,7 @@ import android.widget.Toast;
 
 import androidx.appcompat.app.AppCompatActivity;
 
-import com.codepath.simpletodo.EditItemActivity;
+import com.codepath.R;
 
 import org.apache.commons.io.FileUtils;
 
@@ -32,10 +34,12 @@ public class MainActivity extends AppCompatActivity {
     ListView lvItems;
 
     @Override
+    // send new items to list view
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
+        // initialize elements
         lvItems = (ListView) findViewById(R.id.lvItems);
         readItems();
         itemsAdapter = new ArrayAdapter<> (this, android.R.layout.simple_list_item_1, items);
@@ -50,6 +54,7 @@ public class MainActivity extends AppCompatActivity {
     }
 
     @Override
+    // modify items with toast
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
         if (resultCode == RESULT_OK && requestCode == EDIT_REQUEST_CODE) {
@@ -62,10 +67,11 @@ public class MainActivity extends AppCompatActivity {
         }
     }
 
-
+    // enable listener for long and short item click
     private void setupListViewListener() {
         lvItems.setOnItemLongClickListener(new AdapterView.OnItemLongClickListener() {
         @Override
+            // remove item for long click
             public boolean onItemLongClick(AdapterView<?> parent, View view, int position, long id) {
                 items.remove(position);
                 itemsAdapter.notifyDataSetChanged();
@@ -76,6 +82,7 @@ public class MainActivity extends AppCompatActivity {
         });
         lvItems.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
+            // edit item on click
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
                 Intent i = new Intent(MainActivity.this, EditItemActivity.class);
                 i.putExtra(ITEM_TEXT, items.get(position));
@@ -85,18 +92,31 @@ public class MainActivity extends AppCompatActivity {
         });
     }
 
+    // make keyboard collapse
+    public static void hideKeyboard(Activity activity) {
+        InputMethodManager imm = (InputMethodManager) activity.getSystemService(Activity.INPUT_METHOD_SERVICE);
+        View view = activity.getCurrentFocus();
+        if (view == null) {
+            view = new View(activity);
+        }
+        imm.hideSoftInputFromWindow(view.getWindowToken(), 0);
+    }
+
+    // add new item to list with toast
     public void onAddItem(View v) {
         EditText etNewItem = (EditText) findViewById(R.id.etNewItem);
         String itemText = etNewItem.getText().toString();
         itemsAdapter.add(itemText);
         etNewItem.setText("");
         Toast.makeText(getApplicationContext(), "Item added to list", Toast.LENGTH_SHORT).show();
+        hideKeyboard(this);
     }
 
     private File getDataFile() {
         return new File(getFilesDir(), "todo.txt");
     }
 
+    // read from text file for persistence
     private void readItems() {
         try {
             items = new ArrayList<String>(FileUtils.readLines(getDataFile(), Charset.defaultCharset()));
@@ -106,6 +126,7 @@ public class MainActivity extends AppCompatActivity {
         }
     }
 
+    // write to app for persistence
     private void writeItems() {
         try {
             FileUtils.writeLines(getDataFile(), items);
