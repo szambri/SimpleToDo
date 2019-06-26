@@ -32,7 +32,7 @@ GIF created with [LiceCap](http://www.cockos.com/licecap/).
 
 ## Notes
 
-It was difficult at first to understand Constrain View on Android Studio, but I was eventually able to constrain my app elements using the design view. 
+It was difficult at first to understand Constrain View on Android Studio, but I was eventually able to constrain my app elements using the design view. I also had to practice pushing and committing from Android Studio to GitHub.
 
 ## License
 
